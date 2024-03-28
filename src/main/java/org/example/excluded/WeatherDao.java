@@ -1,4 +1,6 @@
-package org.example;
+package org.example.excluded;
+
+import org.example.Weather;
 
 import java.sql.*;
 import java.util.ArrayList;

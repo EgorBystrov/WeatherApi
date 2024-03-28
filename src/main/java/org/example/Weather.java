@@ -9,6 +9,10 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.HttpEntity;
+import org.example.model.WeatherEntity;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 
 import java.util.Scanner;
 
@@ -18,12 +22,12 @@ public class Weather {
     private int temperature;
 
     public static void main(String[] args) {
-        ////////////Блок кода для вывода данных из таблицы БД
-        WeatherDao weatherDao = new WeatherDao();
-        System.out.println("id\tcity\ttemperature");
-        for (Weather weather: weatherDao.readAll()){
-            System.out.println(weather.getId() + "\t" + weather.getCity() + "\t" + weather.getTemperature());
-        }
+//        ////////////Блок кода для вывода данных из таблицы БД через JDBC
+//        WeatherDao weatherDao = new WeatherDao();
+//        System.out.println("id\tcity\ttemperature");
+//        for (Weather weather: weatherDao.readAll()){
+//            System.out.println(weather.getId() + "\t" + weather.getCity() + "\t" + weather.getTemperature());
+//        }
 
 
 
@@ -50,7 +54,24 @@ public class Weather {
 
 
                     System.out.println("Region: " + jsonNode.get("location").get("region"));
+                    System.out.println("City: " + jsonNode.get("location").get("name"));
                     System.out.println("Temperature (C): " + jsonNode.get("current").get("temp_c"));
+
+                    int temp = jsonNode.get("current").get("temp_c").asInt();
+
+                    // Hibernate пишет полученную инфу в БД
+                    Configuration configuration = new Configuration().addAnnotatedClass(WeatherEntity.class);
+                    SessionFactory sessionFactory = configuration.buildSessionFactory();
+                    Session session = sessionFactory.getCurrentSession();
+
+                    try {
+                        session.beginTransaction();
+                        WeatherEntity weatherEntity = new WeatherEntity(jsonNode.get("location").get("name").asText(), jsonNode.get("current").get("temp_c").asInt());
+                        session.save(weatherEntity);
+                        session.getTransaction().commit();
+                    } finally {
+                        sessionFactory.close();
+                    }
                 }
 
             } catch (Throwable e) {
