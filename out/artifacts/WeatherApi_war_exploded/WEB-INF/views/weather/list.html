@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather List</title>
+</head>
+<body>
+    <div th:each="weather : ${weather_list}">
+        <p th:text="${weather.getCity()}"></p>
+    </div>
+</body>
+</html>
