@@ -1,4 +1,4 @@
-package org.example;
+package org.example.excluded;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -9,7 +9,7 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.HttpEntity;
-import org.example.model.WeatherEntity;
+import org.example.models.WeatherEntity;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -18,7 +18,7 @@ import java.util.Scanner;
 
 public class Weather {
     private int id;
-    private String city;
+    private static String city = "Moscow";
     private int temperature;
 
     public static void main(String[] args) {
@@ -35,9 +35,9 @@ public class Weather {
         while (true) {
 
             //Вводим название города на английском
-            System.out.print("Enter city please: ");
-            Scanner scanner = new Scanner(System.in);
-            String city = scanner.nextLine();
+//            System.out.print("Enter city please: ");
+//            Scanner scanner = new Scanner(System.in);
+//            String city = scanner.nextLine();
 
 
             try (
@@ -60,18 +60,18 @@ public class Weather {
                     int temp = jsonNode.get("current").get("temp_c").asInt();
 
                     // Hibernate пишет полученную инфу в БД
-                    Configuration configuration = new Configuration().addAnnotatedClass(WeatherEntity.class);
-                    SessionFactory sessionFactory = configuration.buildSessionFactory();
-                    Session session = sessionFactory.getCurrentSession();
-
-                    try {
-                        session.beginTransaction();
-                        WeatherEntity weatherEntity = new WeatherEntity(jsonNode.get("location").get("name").asText(), jsonNode.get("current").get("temp_c").asInt());
-                        session.save(weatherEntity);
-                        session.getTransaction().commit();
-                    } finally {
-                        sessionFactory.close();
-                    }
+//                    Configuration configuration = new Configuration().addAnnotatedClass(WeatherEntity.class);
+//                    SessionFactory sessionFactory = configuration.buildSessionFactory();
+//                    Session session = sessionFactory.getCurrentSession();
+//
+//                    try {
+//                        session.beginTransaction();
+//                        WeatherEntity weatherEntity = new WeatherEntity(jsonNode.get("location").get("name").asText(), jsonNode.get("current").get("temp_c").asInt());
+//                        session.save(weatherEntity);
+//                        session.getTransaction().commit();
+//                    } finally {
+//                        sessionFactory.close();
+//                    }
                 }
 
             } catch (Throwable e) {
@@ -80,27 +80,4 @@ public class Weather {
         }
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public int getTemperature() {
-        return temperature;
-    }
-
-    public void setTemperature(int temperature) {
-        this.temperature = temperature;
-    }
 }

@@ -1,4 +1,4 @@
-package org.example.model;
+package org.example.models;
 
 import jakarta.persistence.*;
 
@@ -36,5 +36,13 @@ public class WeatherEntity {
 
     public void setTemperature(int temperature) {
         this.temperature = temperature;
+    }
+
+    @Override
+    public String toString() {
+        return "WeatherEntity{" +
+                "city='" + city + '\'' +
+                ", temperature=" + temperature +
+                '}';
     }
 }

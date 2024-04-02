@@ -37,24 +37,22 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/.idea/libraries" />
+      <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludeFolder url="file://$MODULE_DIR$/src/main/java/org/example/excluded" />
       <excludeFolder url="file://$MODULE_DIR$/.idea/artifacts" />
       <excludeFolder url="file://$MODULE_DIR$/.idea/dataSources" />
-      <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: javax.servlet:javax.servlet-api:4.0.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:javax.servlet-api:4.0.1" level="project" />
     <orderEntry type="library" name="Maven: org.jsoup:jsoup:1.17.2" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.16.1" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.16.1" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.16.1" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-web:6.1.4" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-beans:6.1.4" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-core:6.1.4" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-jcl:6.1.4" level="project" />
-    <orderEntry type="library" name="Maven: io.micrometer:micrometer-observation:1.12.3" level="project" />
-    <orderEntry type="library" name="Maven: io.micrometer:micrometer-commons:1.12.3" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-web:6.1.5" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-beans:6.1.5" level="project" />
+    <orderEntry type="library" name="Maven: io.micrometer:micrometer-observation:1.12.4" level="project" />
+    <orderEntry type="library" name="Maven: io.micrometer:micrometer-commons:1.12.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents.client5:httpclient5:5.3.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents.core5:httpcore5:5.2.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents.core5:httpcore5-h2:5.2.4" level="project" />
@@ -83,5 +81,19 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.istack:istack-commons-runtime:4.1.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: jakarta.inject:jakarta.inject-api:2.0.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.antlr:antlr4-runtime:4.13.0" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-core:6.1.5" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-jcl:6.1.5" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-context:6.1.5" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-aop:6.1.5" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-expression:6.1.5" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-webmvc:6.1.5" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-orm:6.1.5" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-jdbc:6.1.5" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-tx:6.1.5" level="project" />
+    <orderEntry type="library" name="Maven: org.thymeleaf:thymeleaf-spring6:3.1.2.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.thymeleaf:thymeleaf:3.1.2.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.attoparser:attoparser:2.0.7.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.unbescape:unbescape:1.1.6.RELEASE" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: jakarta.servlet:jakarta.servlet-api:6.1.0-M2" level="project" />
   </component>
 </module>
