@@ -1,0 +1,9 @@
+<changelist name="Uncommitted_changes_before_Update_at_28_03_2024_16_31_[Changes]1" date="1711632727508" recycled="true" deleted="true">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_28_03_2024_16_31_[Changes]1/shelved.patch" />
+  <option name="DESCRIPTION" value="Uncommitted changes before Update at 28.03.2024 16:31 [Changes]" />
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/org/example/Weather.class" />
+    <option name="AFTER_PATH" value="target/classes/org/example/Weather.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_28_03_2024_16_31_[Changes]1/Weather.class" />
+  </binary>
+</changelist>

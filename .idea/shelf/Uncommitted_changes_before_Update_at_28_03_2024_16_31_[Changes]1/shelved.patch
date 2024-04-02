@@ -1,0 +1,217 @@
+Index: src/main/java/org/example/Weather.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.example;\r\n\r\n\r\nimport com.fasterxml.jackson.databind.JsonNode;\r\nimport com.fasterxml.jackson.databind.ObjectMapper;\r\nimport org.apache.commons.io.IOUtils;\r\nimport org.apache.hc.client5.http.classic.methods.HttpGet;\r\nimport org.apache.hc.client5.http.impl.classic.CloseableHttpClient;\r\nimport org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;\r\nimport org.apache.hc.client5.http.impl.classic.HttpClients;\r\nimport org.apache.hc.core5.http.HttpEntity;\r\n\r\nimport java.util.Scanner;\r\n\r\npublic class Weather {\r\n    private int id;\r\n    private String city;\r\n    private int temperature;\r\n\r\n    public static void main(String[] args) {\r\n        ////////////Блок кода для вывода данных из таблицы БД\r\n        WeatherDao weatherDao = new WeatherDao();\r\n        System.out.println(\"id\\tcity\\ttemperature\");\r\n        for (Weather weather: weatherDao.readAll()){\r\n            System.out.println(weather.getId() + \"\\t\" + weather.getCity() + \"\\t\" + weather.getTemperature());\r\n        }\r\n\r\n\r\n\r\n        ////////////Блок кода для подключения к API погоды\r\n        while (true) {\r\n\r\n            //Вводим название города на английском\r\n            System.out.print(\"Enter city please: \");\r\n            Scanner scanner = new Scanner(System.in);\r\n            String city = scanner.nextLine();\r\n\r\n\r\n            try (\r\n                    CloseableHttpClient client = HttpClients.createDefault();\r\n                    CloseableHttpResponse response = client.execute(new HttpGet(String.format(\"http://api.weatherapi.com/v1/current.json?key=3c58bcab3de04398b16135017240903&q=%s&aqi=no\", city))) //Здесь генерируется запрос на сервер (нужен Api Key)\r\n            ) {\r\n                HttpEntity entity = response.getEntity();\r\n                if (entity != null) {\r\n                    String data = IOUtils.toString(entity.getContent(), \"cp1251\"); //Переводим полученный ответ в кодировку Windows\r\n\r\n                    // Парсим полученный JSON с помощью Jackson\r\n                    ObjectMapper mapper = new ObjectMapper();\r\n                    JsonNode jsonNode = mapper.readTree(data);\r\n\r\n\r\n                    System.out.println(\"Region: \" + jsonNode.get(\"location\").get(\"region\"));\r\n                    System.out.println(\"Temperature (C): \" + jsonNode.get(\"current\").get(\"temp_c\"));\r\n                }\r\n\r\n            } catch (Throwable e) {\r\n                System.out.println(\"City was not found\");\r\n            }\r\n        }\r\n    }\r\n\r\n    public int getId() {\r\n        return id;\r\n    }\r\n\r\n    public void setId(int id) {\r\n        this.id = id;\r\n    }\r\n\r\n    public String getCity() {\r\n        return city;\r\n    }\r\n\r\n    public void setCity(String city) {\r\n        this.city = city;\r\n    }\r\n\r\n    public int getTemperature() {\r\n        return temperature;\r\n    }\r\n\r\n    public void setTemperature(int temperature) {\r\n        this.temperature = temperature;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/Weather.java b/src/main/java/org/example/Weather.java
+--- a/src/main/java/org/example/Weather.java	
++++ b/src/main/java/org/example/Weather.java	
+@@ -9,6 +9,10 @@
+ import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+ import org.apache.hc.client5.http.impl.classic.HttpClients;
+ import org.apache.hc.core5.http.HttpEntity;
++import org.example.model.WeatherEntity;
++import org.hibernate.Session;
++import org.hibernate.SessionFactory;
++import org.hibernate.cfg.Configuration;
+ 
+ import java.util.Scanner;
+ 
+@@ -18,12 +22,12 @@
+     private int temperature;
+ 
+     public static void main(String[] args) {
+-        ////////////Блок кода для вывода данных из таблицы БД
+-        WeatherDao weatherDao = new WeatherDao();
+-        System.out.println("id\tcity\ttemperature");
+-        for (Weather weather: weatherDao.readAll()){
+-            System.out.println(weather.getId() + "\t" + weather.getCity() + "\t" + weather.getTemperature());
+-        }
++//        ////////////Блок кода для вывода данных из таблицы БД через JDBC
++//        WeatherDao weatherDao = new WeatherDao();
++//        System.out.println("id\tcity\ttemperature");
++//        for (Weather weather: weatherDao.readAll()){
++//            System.out.println(weather.getId() + "\t" + weather.getCity() + "\t" + weather.getTemperature());
++//        }
+ 
+ 
+ 
+@@ -50,7 +54,24 @@
+ 
+ 
+                     System.out.println("Region: " + jsonNode.get("location").get("region"));
++                    System.out.println("City: " + jsonNode.get("location").get("name"));
+                     System.out.println("Temperature (C): " + jsonNode.get("current").get("temp_c"));
++
++                    int temp = jsonNode.get("current").get("temp_c").asInt();
++
++                    // Hibernate пишет полученную инфу в БД
++                    Configuration configuration = new Configuration().addAnnotatedClass(WeatherEntity.class);
++                    SessionFactory sessionFactory = configuration.buildSessionFactory();
++                    Session session = sessionFactory.getCurrentSession();
++
++                    try {
++                        session.beginTransaction();
++                        WeatherEntity weatherEntity = new WeatherEntity(jsonNode.get("location").get("name").asText(), jsonNode.get("current").get("temp_c").asInt());
++                        session.save(weatherEntity);
++                        session.getTransaction().commit();
++                    } finally {
++                        sessionFactory.close();
++                    }
+                 }
+ 
+             } catch (Throwable e) {
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\r\n         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\r\n         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\r\n    <modelVersion>4.0.0</modelVersion>\r\n\r\n    <groupId>org.example</groupId>\r\n    <artifactId>WeatherApi</artifactId>\r\n    <version>1.0-SNAPSHOT</version>\r\n\r\n    <properties>\r\n        <maven.compiler.source>17</maven.compiler.source>\r\n        <maven.compiler.target>17</maven.compiler.target>\r\n        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>\r\n    </properties>\r\n    <dependencies>\r\n        <dependency>\r\n            <groupId>javax.servlet</groupId>\r\n            <artifactId>javax.servlet-api</artifactId>\r\n            <version>4.0.1</version>\r\n        </dependency>\r\n\r\n        <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->\r\n        <dependency>\r\n            <groupId>org.jsoup</groupId>\r\n            <artifactId>jsoup</artifactId>\r\n            <version>1.17.2</version>\r\n        </dependency>\r\n\r\n        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->\r\n        <dependency>\r\n            <groupId>com.fasterxml.jackson.core</groupId>\r\n            <artifactId>jackson-databind</artifactId>\r\n            <version>2.16.1</version>\r\n        </dependency>\r\n\r\n        <!-- https://mvnrepository.com/artifact/org.springframework/spring-web -->\r\n        <dependency>\r\n            <groupId>org.springframework</groupId>\r\n            <artifactId>spring-web</artifactId>\r\n            <version>6.1.4</version>\r\n        </dependency>\r\n\r\n        <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents.client5/httpclient5 -->\r\n        <dependency>\r\n            <groupId>org.apache.httpcomponents.client5</groupId>\r\n            <artifactId>httpclient5</artifactId>\r\n            <version>5.3.1</version>\r\n        </dependency>\r\n\r\n        <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore -->\r\n        <dependency>\r\n            <groupId>org.apache.httpcomponents</groupId>\r\n            <artifactId>httpcore</artifactId>\r\n            <version>4.4.16</version>\r\n        </dependency>\r\n\r\n        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->\r\n        <dependency>\r\n            <groupId>commons-io</groupId>\r\n            <artifactId>commons-io</artifactId>\r\n            <version>2.15.1</version>\r\n        </dependency>\r\n\r\n        <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl -->\r\n        <dependency>\r\n            <groupId>org.apache.logging.log4j</groupId>\r\n            <artifactId>log4j-slf4j-impl</artifactId>\r\n            <version>2.23.0</version>\r\n            <scope>test</scope>\r\n        </dependency>\r\n\r\n        <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->\r\n        <dependency>\r\n            <groupId>org.postgresql</groupId>\r\n            <artifactId>postgresql</artifactId>\r\n            <version>42.7.2</version>\r\n        </dependency>\r\n\r\n\r\n    </dependencies>\r\n\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pom.xml b/pom.xml
+--- a/pom.xml	
++++ b/pom.xml	
+@@ -77,6 +77,14 @@
+             <version>42.7.2</version>
+         </dependency>
+ 
++        <!-- https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-core -->
++        <dependency>
++            <groupId>org.hibernate.orm</groupId>
++            <artifactId>hibernate-core</artifactId>
++            <version>6.4.4.Final</version>
++        </dependency>
++
++
+ 
+     </dependencies>
+ 
+Index: src/main/java/org/example/WeatherDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/WeatherDao.java b/src/main/java/org/example/excluded/WeatherDao.java
+rename from src/main/java/org/example/WeatherDao.java
+rename to src/main/java/org/example/excluded/WeatherDao.java
+--- a/src/main/java/org/example/WeatherDao.java	
++++ b/src/main/java/org/example/excluded/WeatherDao.java	
+@@ -1,4 +1,6 @@
+-package org.example;
++package org.example.excluded;
++
++import org.example.Weather;
+ 
+ import java.sql.*;
+ import java.util.ArrayList;
+Index: .idea/WeatherApi.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/WeatherApi.iml b/.idea/WeatherApi.iml
+new file mode 100644
+--- /dev/null	
++++ b/.idea/WeatherApi.iml	
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module version="4">
++  <component name="NewModuleRootManager">
++    <content url="file://$MODULE_DIR$">
++      <excludeFolder url="file://$MODULE_DIR$/src/main/java/org/example/excluded" />
++    </content>
++  </component>
++</module>
+\ No newline at end of file
+Index: .idea/modules.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/modules.xml b/.idea/modules.xml
+new file mode 100644
+--- /dev/null	
++++ b/.idea/modules.xml	
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="ProjectModuleManager">
++    <modules>
++      <module fileurl="file://$PROJECT_DIR$/.idea/WeatherApi.iml" filepath="$PROJECT_DIR$/.idea/WeatherApi.iml" />
++    </modules>
++  </component>
++</project>
+\ No newline at end of file
+Index: src/main/java/org/example/model/WeatherEntity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/model/WeatherEntity.java b/src/main/java/org/example/model/WeatherEntity.java
+new file mode 100644
+--- /dev/null	
++++ b/src/main/java/org/example/model/WeatherEntity.java	
+@@ -0,0 +1,40 @@
++package org.example.model;
++
++import jakarta.persistence.*;
++
++// Сущность для hibernate
++@Entity
++@Table(name = "weather")
++public class WeatherEntity {
++    public WeatherEntity(){}
++
++    public WeatherEntity(String city, int temperature) {
++        this.city = city;
++        this.temperature = temperature;
++    }
++
++    @Id
++    @Column(name = "id")
++    @GeneratedValue(strategy = GenerationType.IDENTITY)
++    private int id;
++    @Column(name = "city")
++    private String city;
++    @Column(name = "temperature")
++    private int temperature;
++
++    public String getCity() {
++        return city;
++    }
++
++    public void setCity(String city) {
++        this.city = city;
++    }
++
++    public int getTemperature() {
++        return temperature;
++    }
++
++    public void setTemperature(int temperature) {
++        this.temperature = temperature;
++    }
++}
+Index: src/main/resources/hibernate.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>ISO-8859-1
+===================================================================
+diff --git a/src/main/resources/hibernate.properties b/src/main/resources/hibernate.properties
+new file mode 100644
+--- /dev/null	
++++ b/src/main/resources/hibernate.properties	
+@@ -0,0 +1,10 @@
++# ???????????? ????????? ??????
++hibernate.driver_class=org.postgresql.Driver
++hibernate.connection.url=jdbc:postgresql://localhost:5432/weather_api_dp
++hibernate.connection.username=postgres
++hibernate.connection.password=postgres
++
++# ???????????? ?????? Hibernate
++hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
++hibernate.show_sql=true
++hibernate.current_session_context_class=thread
+\ No newline at end of file
